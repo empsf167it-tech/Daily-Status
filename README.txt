@@ -18,5 +18,8 @@ FEATURES & INSTRUCTIONS:
    - Direct Sending via EmailJS: Click "⚙️ Email Settings" in the Consolidated Report tab to enter your free EmailJS Service ID, Template ID, and Public Key (emailjs.com). Once entered, "Send Report" will send the email directly in the browser.
    - Default Mail Client: Opens your system's mail client, automatically copying the full text to your clipboard so nothing is lost if subject/body length limits are reached.
 
-5. Data Storage:
-   - Data is saved automatically per date in browser local storage.
+5. Real-Time Cloud Database & Multi-Location Storage:
+   - Live Multi-User Sync: Connect to Firebase Realtime Database so all employees entering status from different laptops/locations are stored centrally and visible live in real time.
+   - 2-Minute Setup: Click "Cloud DB" in the top header. Paste your free Firebase Realtime Database URL (e.g. https://your-app-default-rtdb.firebaseio.com).
+   - 1-Click Team Link: In the Cloud DB settings modal, click "Copy Team Link". Share this link with your team on Slack, Teams, or WhatsApp. Anyone who opens the link is connected to the exact same database automatically without any manual setup.
+   - Offline / Local Backup: Data continues to be backed up locally in browser storage even if offline.

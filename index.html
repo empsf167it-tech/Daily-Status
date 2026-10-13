@@ -8,6 +8,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4.4.1/dist/email.min.js"></script>
+<!-- Firebase App and Realtime Database SDKs for Real-time Multi-user Cloud Sync -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <style>
 :root{--navy:#002a55;--navy2:#1a4b72;--or:#f66702;--yl:#febd0d;--gr:#03b166;--lm:#82ad40;--pu:#962bfb;--bl:#0185fe;--pk:#ee0f50;--ink:#0b2342;--mut:#5d7088;--ln:#e0e8f2;--bg:#f3f7fc}
 *{box-sizing:border-box;margin:0}
@@ -148,15 +151,34 @@ footer b{font-family:Caveat,cursive;font-size:20px;color:var(--yl);margin-right:
 .choice-title{font-weight:700;font-size:14px;color:var(--navy);display:block}
 .choice-sub{font-size:12px;color:var(--mut);display:block;margin-top:2px}
 
+.top-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.db-pill-btn{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1.5px solid var(--ln);border-radius:12px;padding:7px 14px;font:600 12.5px Poppins,sans-serif;color:var(--navy);cursor:pointer;transition:all .15s;box-shadow:0 2px 8px rgba(0,40,90,.04)}
+.db-pill-btn:hover{border-color:var(--or);box-shadow:0 4px 14px rgba(246,103,2,.15);transform:translateY(-1px)}
+.db-dot{width:10px;height:10px;border-radius:50%;background:#f59e0b;flex:none;transition:background .2s,box-shadow .2s}
+.db-dot.online{background:var(--gr);box-shadow:0 0 0 3px rgba(3,177,102,.25)}
+.db-dot.syncing{background:var(--bl);animation:dbPulse .8s infinite alternate}
+.db-dot.offline{background:#f59e0b}
+.db-dot.error{background:var(--pk);box-shadow:0 0 0 3px rgba(238,15,80,.2)}
+@keyframes dbPulse{from{opacity:.4;transform:scale(.9)}to{opacity:1;transform:scale(1.15)}}
+.db-guide{background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:12px 14px;font-size:12px;color:var(--ink);margin-bottom:14px;line-height:1.55}
+.db-guide ol{margin:6px 0 0 18px;padding:0}
+.db-guide li{margin-bottom:4px}
+
 @media(max-width:860px){.layout{grid-template-columns:1fr}.side{position:static}#list{max-height:260px}.tg{grid-template-columns:1fr 1fr}.wk{grid-template-columns:1fr}.wk textarea{grid-column:auto}.x{height:38px}.hero h1{font-size:24px}.mail label{min-width:100%}}
-@media print{header .date,.side,.tabs,.mail,.note,.hero:before,footer,.modal-wrap{display:none!important}.card{box-shadow:none}.rep .layout{display:block}}
+@media print{header .date,.side,.tabs,.mail,.note,.hero:before,footer,.modal-wrap,.top-actions button{display:none!important}.card{box-shadow:none}.rep .layout{display:block}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
 <body>
 <header><div class="wrap top">
  <div class="brand"><img src="logo.png" alt="Smart Fusion logo"><i></i><div class="wm">SMART<b>FUSION</b><small>TRUST US WE WILL BUILD YOUR SUCCESS</small></div></div>
- <label class="date">Date <input type="date" id="date"></label>
+ <div class="top-actions">
+  <button type="button" class="db-pill-btn" id="btn-db-status" title="Real-time Cloud Database Sync Status & Settings">
+    <span class="db-dot" id="db-dot"></span>
+    <span id="db-status-text">Cloud DB</span>
+  </button>
+  <label class="date">Date <input type="date" id="date"></label>
+ </div>
 </div></header>
 
 <main class="wrap">
@@ -266,6 +288,62 @@ footer b{font-family:Caveat,cursive;font-size:20px;color:var(--yl);margin-right:
   </div>
 </div>
 
+<!-- Realtime Cloud Database Configuration Modal -->
+<div id="db-modal" class="modal-wrap" style="display:none">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3>☁️ Real-time Cloud Database Sync</h3>
+      <button type="button" class="modal-close" id="db-modal-close" aria-label="Close modal">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div id="db-connection-banner" class="modal-info" style="margin-top:0;margin-bottom:14px;display:flex;align-items:center;gap:10px">
+        <span class="db-dot" id="modal-db-dot"></span>
+        <span id="modal-db-status" style="font-weight:600">Local Storage Mode</span>
+      </div>
+      
+      <p class="modal-desc">Connect this website to <strong>Firebase Realtime Database</strong> so that developers and testers in any location can submit their attendance and work entries, and everyone can view updates live in real time!</p>
+      
+      <div class="db-guide">
+        <strong>⚡ 2-Minute Free Cloud Setup:</strong>
+        <ol>
+          <li>Visit <a href="https://console.firebase.google.com" target="_blank" rel="noopener" style="color:var(--bl);font-weight:600">Firebase Console</a> and click <strong>Create a project</strong>.</li>
+          <li>In the left menu, select <strong>Build &gt; Realtime Database</strong> &gt; click <strong>Create Database</strong>.</li>
+          <li>Choose <strong>Start in test mode</strong> (so read/write rules are allowed).</li>
+          <li>Copy your <strong>Database URL</strong> (e.g. <code>https://your-project-default-rtdb.firebaseio.com</code>) or your Web App Config and paste below.</li>
+        </ol>
+      </div>
+
+      <label class="f" style="margin-bottom:10px">Quick Paste: Database URL or Firebase Config Snippet
+        <textarea id="cfg-db-raw" rows="3" placeholder="Paste: https://your-db-default-rtdb.firebaseio.com/ OR full firebaseConfig { ... }" style="margin-top:4px;font-family:monospace;font-size:12px"></textarea>
+      </label>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+        <label class="f">Database URL
+          <input type="text" id="cfg-db-url" value="https://smart-fusion-daily-status-default-rtdb.firebaseio.com" placeholder="https://smart-fusion-daily-status-default-rtdb.firebaseio.com" style="margin-top:4px;font-size:12px">
+        </label>
+        <label class="f">Project ID
+          <input type="text" id="cfg-db-project" value="smart-fusion-daily-status" placeholder="smart-fusion-daily-status" style="margin-top:4px;font-size:12px">
+        </label>
+      </div>
+
+      <label class="f" style="margin-bottom:12px">API Key (optional if public rules enabled)
+        <input type="text" id="cfg-db-key" placeholder="e.g. AIzaSy..." style="margin-top:4px;font-size:12px">
+      </label>
+
+      <div class="modal-info" style="background:#eef6ff;border-color:#bad7fc">
+        <strong>👥 Multi-User Team Sharing:</strong> Once connected, click <strong>"Copy Team Link"</strong> below and share the link with your team. Anyone opening the link will be automatically connected to this database!
+      </div>
+    </div>
+    <div class="modal-foot" style="justify-content:space-between">
+      <button type="button" class="btn ghost btn-sm" id="btn-db-disconnect" style="color:var(--pk);border-color:#fecdd3">Disconnect / Offline</button>
+      <div style="display:flex;gap:8px">
+        <button type="button" class="btn ghost btn-sm" id="btn-db-share">🔗 Copy Team Link</button>
+        <button type="button" class="btn btn-sm" id="btn-db-save">Save &amp; Connect</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 // Default fallback keys (can also be saved via the in-app "Email Settings" modal)
 const DEFAULT_EMAILJS = { service: '', template: '', key: '', defaultTo: '' };
@@ -302,12 +380,194 @@ const ini = n => n.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
 const today = () => { const d = new Date(); return new Date(d - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 10); };
 let date = today(), team = 'All', sel = EMP[0].id, view = 'entry', data = {};
 
+// ==========================================
+// REAL-TIME CLOUD DATABASE (FIREBASE RTDB)
+// ==========================================
+let db = null;
+let currentDbDateRef = null;
+
+const DEFAULT_FIREBASE = {
+  databaseURL: 'https://smart-fusion-daily-status-default-rtdb.firebaseio.com',
+  projectId: 'smart-fusion-daily-status',
+  apiKey: 'AIzaSySmartFusionStatusKey',
+  authDomain: 'smart-fusion-daily-status.firebaseapp.com'
+};
+
+function getFirebaseConfig() {
+  // 1. Check URL hash or search parameter first (e.g. #firebase=... or ?firebase=...)
+  try {
+    const hash = window.location.hash || '';
+    const search = window.location.search || '';
+    const src = hash.includes('firebase=') ? hash : (search.includes('firebase=') ? search : '');
+    if (src) {
+      const match = src.match(/firebase=([^&]+)/);
+      if (match && match[1]) {
+        const decoded = JSON.parse(decodeURIComponent(match[1]));
+        if (decoded && (decoded.databaseURL || decoded.projectId)) {
+          saveFirebaseConfig(decoded);
+          if (window.history && window.history.replaceState) {
+            window.history.replaceState(null, '', window.location.pathname);
+          }
+          toast('⚡ Connected to shared team database via link!');
+          return decoded;
+        }
+      }
+    }
+  } catch (e) {
+    console.warn('URL DB config parsing error:', e);
+  }
+
+  // 2. Check localStorage
+  try {
+    const saved = JSON.parse(localStorage.getItem('sf_firebase_config'));
+    if (saved && (saved.databaseURL || saved.projectId)) return saved;
+  } catch (e) {}
+
+  // 3. Built-in hardcoded Cloud DB default
+  return DEFAULT_FIREBASE;
+}
+
+function saveFirebaseConfig(cfg) {
+  try {
+    localStorage.setItem('sf_firebase_config', JSON.stringify(cfg));
+  } catch (e) {}
+}
+
+function updateDbBadge(status, label) {
+  const dot = $('#db-dot');
+  const txt = $('#db-status-text');
+  const mDot = $('#modal-db-dot');
+  const mTxt = $('#modal-db-status');
+  
+  const clsMap = { online: 'online', syncing: 'syncing', offline: 'offline', error: 'error' };
+  const curCls = clsMap[status] || 'offline';
+
+  [dot, mDot].forEach(d => {
+    if (d) d.className = 'db-dot ' + curCls;
+  });
+
+  if (txt) txt.textContent = label;
+  if (mTxt) mTxt.textContent = label;
+}
+
+function initFirebase() {
+  const cfg = getFirebaseConfig();
+  if (!cfg || (!cfg.databaseURL && !cfg.projectId)) {
+    updateDbBadge('offline', 'Local DB (Click to Connect)');
+    return;
+  }
+
+  try {
+    if (typeof firebase === 'undefined') {
+      console.warn('Firebase SDK offline');
+      updateDbBadge('error', 'Firebase SDK Offline');
+      return;
+    }
+
+    if (firebase.apps && firebase.apps.length) {
+      firebase.app().delete().then(() => startFirebaseInstance(cfg));
+    } else {
+      startFirebaseInstance(cfg);
+    }
+  } catch (err) {
+    console.error('Firebase initialization error:', err);
+    updateDbBadge('error', 'DB Init Error');
+  }
+}
+
+function startFirebaseInstance(cfg) {
+  try {
+    const initPayload = {
+      apiKey: cfg.apiKey || 'AIzaSySmartFusionStatusKey',
+      authDomain: cfg.authDomain || (cfg.projectId ? cfg.projectId + '.firebaseapp.com' : ''),
+      databaseURL: cfg.databaseURL,
+      projectId: cfg.projectId || ((cfg.databaseURL || '').match(/https:\/\/([^.]+)/) || [])[1] || 'smart-fusion-status'
+    };
+    
+    firebase.initializeApp(initPayload);
+    db = firebase.database();
+    
+    updateDbBadge('syncing', 'Connecting to Cloud...');
+
+    // Monitor live connection status
+    db.ref('.info/connected').on('value', snap => {
+      if (snap.val() === true) {
+        updateDbBadge('online', 'Live Cloud Sync');
+      } else {
+        updateDbBadge('syncing', 'Connecting...');
+      }
+    });
+
+    setupFirebaseDateSync();
+  } catch (err) {
+    console.error('startFirebaseInstance error:', err);
+    updateDbBadge('error', 'Invalid DB Config');
+  }
+}
+
+function setupFirebaseDateSync() {
+  if (!db) return;
+  if (currentDbDateRef) {
+    try { currentDbDateRef.off(); } catch (e) {}
+  }
+
+  currentDbDateRef = db.ref('daily_status/' + date);
+  currentDbDateRef.on('value', snapshot => {
+    const remoteData = snapshot.val();
+    if (remoteData && typeof remoteData === 'object') {
+      let changed = false;
+      EMP.forEach(e => {
+        if (remoteData[e.id]) {
+          if (!remoteData[e.id].works) remoteData[e.id].works = [];
+          if (!data[e.id] || JSON.stringify(data[e.id]) !== JSON.stringify(remoteData[e.id])) {
+            data[e.id] = remoteData[e.id];
+            changed = true;
+          }
+        }
+      });
+
+      if (changed) {
+        try { localStorage.setItem(key(), JSON.stringify(data)); } catch (e) {}
+        side();
+        // Do not overwrite inputs if user is currently typing
+        const active = document.activeElement;
+        const isEditing = active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA') && $('#main') && $('#main').contains(active);
+        if (!isEditing) {
+          view === 'entry' ? entry() : rep();
+        } else {
+          chips();
+        }
+      }
+    }
+  }, err => {
+    console.warn('Realtime database sync error:', err);
+    updateDbBadge('error', 'Cloud Permission Error');
+  });
+}
+
 const key = () => 'sf_status_' + date;
 function load() {
   try { data = JSON.parse(localStorage.getItem(key())) || {}; } catch (e) { data = {}; }
 }
-function save() {
+
+function save(empId) {
   try { localStorage.setItem(key(), JSON.stringify(data)); } catch (e) { toast('Could not save in this browser'); }
+  
+  if (db) {
+    updateDbBadge('syncing', 'Syncing to Cloud...');
+    const idToSave = empId || sel;
+    const targetRef = idToSave && data[idToSave]
+      ? db.ref('daily_status/' + date + '/' + idToSave)
+      : db.ref('daily_status/' + date);
+    const targetVal = idToSave && data[idToSave] ? data[idToSave] : data;
+
+    targetRef.set(targetVal).then(() => {
+      updateDbBadge('online', 'Live Cloud Sync');
+    }).catch(err => {
+      console.warn('Firebase save warning:', err);
+      updateDbBadge('error', 'Sync Failed (Saved Locally)');
+    });
+  }
 }
 function rec(id) {
   if (!data[id]) {
@@ -609,7 +869,7 @@ $('#main').addEventListener('input', ev => {
   } else {
     return;
   }
-  save();
+  save(sel);
   side();
   if (['login', 'lo', 'li', 'logout'].includes(t.dataset.f)) {
     updateAttendanceAlertsAndReason();
@@ -623,17 +883,17 @@ $('#main').addEventListener('click', ev => {
   if (t.dataset.now) {
     const d = new Date(), v = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
     r[t.dataset.now] = v;
-    save();
+    save(sel);
     t.previousElementSibling.value = v;
     side();
     updateAttendanceAlertsAndReason();
   } else if (t.id === 'add') {
     r.works.push({ site: '', type: 'new', note: '' });
-    save();
+    save(sel);
     entry();
   } else if (t.dataset.del) {
     r.works.splice(+t.dataset.del, 1);
-    save();
+    save(sel);
     entry();
     side();
   } else if (t.id === 'save') {
@@ -647,8 +907,8 @@ $('#main').addEventListener('click', ev => {
       }
       return;
     }
-    save();
-    toast('Status saved for ' + EMP.find(x => x.id === sel).name);
+    save(sel);
+    toast((db ? '☁️ Synced to Cloud DB for ' : 'Status saved for ') + EMP.find(x => x.id === sel).name);
   } else if (t.id === 'copy') {
     navigator.clipboard.writeText(report()).then(() => toast('Report copied to clipboard'), () => toast('Copy failed'));
   } else if (t.id === 'send') {
@@ -835,15 +1095,122 @@ $('#email-modal-save').onclick = () => {
   toast('Email settings saved successfully!');
 };
 
+// Real-time Cloud Database Modal Controls
+function openDbConfigModal() {
+  const cfg = getFirebaseConfig() || DEFAULT_FIREBASE;
+  $('#cfg-db-url').value = cfg.databaseURL || '';
+  $('#cfg-db-project').value = cfg.projectId || '';
+  $('#cfg-db-key').value = cfg.apiKey || '';
+  $('#cfg-db-raw').value = '';
+  $('#db-modal').style.display = 'flex';
+}
+
+function closeDbConfigModal() {
+  $('#db-modal').style.display = 'none';
+}
+
+$('#btn-db-status').onclick = openDbConfigModal;
+$('#db-modal-close').onclick = closeDbConfigModal;
+
+$('#cfg-db-raw').addEventListener('input', e => {
+  const val = e.target.value.trim();
+  if (!val) return;
+  
+  const urlMatch = val.match(/https:\/\/[a-zA-Z0-9-]+(?:\.firebaseio\.com|\.firebasedatabase\.app)(?:\/[a-zA-Z0-9_\-\/]*)?/);
+  if (urlMatch) {
+    $('#cfg-db-url').value = urlMatch[0];
+    const projMatch = urlMatch[0].match(/https:\/\/([^.]+)/);
+    if (projMatch) $('#cfg-db-project').value = projMatch[1];
+  }
+  
+  const keyMatch = val.match(/apiKey["']?\s*:\s*["']([^"']+)["']/);
+  if (keyMatch) $('#cfg-db-key').value = keyMatch[1];
+
+  const projMatch2 = val.match(/projectId["']?\s*:\s*["']([^"']+)["']/);
+  if (projMatch2) $('#cfg-db-project').value = projMatch2[1];
+
+  const dbUrlMatch = val.match(/databaseURL["']?\s*:\s*["']([^"']+)["']/);
+  if (dbUrlMatch) $('#cfg-db-url').value = dbUrlMatch[1];
+});
+
+$('#btn-db-save').onclick = () => {
+  let dbUrl = $('#cfg-db-url').value.trim();
+  let proj = $('#cfg-db-project').value.trim();
+  let apiKey = $('#cfg-db-key').value.trim();
+
+  const raw = $('#cfg-db-raw').value.trim();
+  if (!dbUrl && raw) {
+    const urlM = raw.match(/https:\/\/[a-zA-Z0-9-]+(?:\.firebaseio\.com|\.firebasedatabase\.app)/);
+    if (urlM) dbUrl = urlM[0];
+  }
+
+  if (!dbUrl && !proj) {
+    toast('⚠️ Please provide at least a Database URL or Project ID');
+    return;
+  }
+
+  if (dbUrl && !dbUrl.startsWith('https://')) {
+    dbUrl = 'https://' + dbUrl;
+  }
+
+  if (!proj && dbUrl) {
+    const pm = dbUrl.match(/https:\/\/([^.]+)/);
+    if (pm) proj = pm[1];
+  }
+
+  const cfg = {
+    databaseURL: dbUrl,
+    projectId: proj,
+    apiKey: apiKey,
+    authDomain: proj ? proj + '.firebaseapp.com' : ''
+  };
+
+  saveFirebaseConfig(cfg);
+  initFirebase();
+  closeDbConfigModal();
+  toast('☁️ Database settings saved! Syncing in real time...');
+};
+
+$('#btn-db-disconnect').onclick = () => {
+  localStorage.removeItem('sf_firebase_config');
+  if (currentDbDateRef) {
+    try { currentDbDateRef.off(); } catch (e) {}
+  }
+  if (typeof firebase !== 'undefined' && firebase.apps.length) {
+    firebase.app().delete();
+  }
+  db = null;
+  updateDbBadge('offline', 'Local DB (Click to Connect)');
+  closeDbConfigModal();
+  toast('Switched to local browser storage.');
+};
+
+$('#btn-db-share').onclick = () => {
+  const cfg = getFirebaseConfig();
+  if (!cfg || !cfg.databaseURL) {
+    toast('⚠️ Connect your database first before sharing team link!');
+    return;
+  }
+  const cleanUrl = window.location.origin + window.location.pathname;
+  const shareUrl = cleanUrl + '#firebase=' + encodeURIComponent(JSON.stringify(cfg));
+  navigator.clipboard.writeText(shareUrl).then(() => {
+    toast('📋 Team setup link copied! Send to team on Slack/Teams/WhatsApp.');
+  }, () => {
+    prompt('Copy this team setup link:', shareUrl);
+  });
+};
+
 // Close modal when clicking outside
 window.addEventListener('click', ev => {
   if (ev.target === $('#email-modal')) closeEmailConfigModal();
   if (ev.target === $('#choice-modal')) closeChoiceModal();
+  if (ev.target === $('#db-modal')) closeDbConfigModal();
 });
 window.addEventListener('keydown', ev => {
   if (ev.key === 'Escape') {
     closeEmailConfigModal();
     closeChoiceModal();
+    closeDbConfigModal();
   }
 });
 
@@ -869,10 +1236,12 @@ $('#date').value = date;
 $('#date').addEventListener('change', e => {
   date = e.target.value || today();
   load();
+  if (db) setupFirebaseDateSync();
   render();
 });
 
 load();
+initFirebase();
 render();
 </script>
 </body>
