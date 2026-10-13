@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Smart Fusion | Daily Status</title>
+<link rel="icon" href="logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4.4.1/dist/email.min.js"></script>
+<style>
+:root{--navy:#002a55;--navy2:#1a4b72;--or:#f66702;--yl:#febd0d;--gr:#03b166;--lm:#82ad40;--pu:#962bfb;--bl:#0185fe;--pk:#ee0f50;--ink:#0b2342;--mut:#5d7088;--ln:#e0e8f2;--bg:#f3f7fc}
+*{box-sizing:border-box;margin:0}
+body{font:14px/1.55 Poppins,system-ui,sans-serif;color:var(--ink);min-height:100vh;background:radial-gradient(900px 420px at 100% -60px,#ffe6cf,transparent),radial-gradient(800px 420px at -10% 0,#d9ebff,transparent),var(--bg)}
+.wrap{max-width:1280px;margin:0 auto;padding:0 24px}
+header{background:#fff;border-bottom:1px solid var(--ln);position:relative}
+header:after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:3px;background:linear-gradient(90deg,var(--bl),var(--gr) 35%,var(--yl) 65%,var(--or))}
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 0}
+.brand{display:flex;align-items:center;gap:14px}
+.brand img{width:58px;height:56px;object-fit:contain}
+.brand i{width:1px;height:48px;background:var(--navy);opacity:.7}
+.wm{font-weight:800;font-size:25px;line-height:1;letter-spacing:.5px;color:var(--navy)}
+.wm b{display:block;background:linear-gradient(90deg,var(--gr),var(--bl));-webkit-background-clip:text;background-clip:text;color:transparent}
+.wm small{display:block;font-size:8.5px;font-weight:600;letter-spacing:.3px;margin-top:5px;color:var(--navy)}
+.date{display:flex;align-items:center;gap:10px;font-weight:600}
+input,select,textarea{font:inherit;color:var(--ink);background:#fff;border:1.5px solid var(--ln);border-radius:10px;padding:8px 11px;width:100%;outline:0;transition:border .15s,box-shadow .15s}
+input:focus,select:focus,textarea:focus,button:focus-visible{border-color:var(--or);box-shadow:0 0 0 3px #f6670226}
+.date input{width:auto}
+.hero{margin:22px 0;border-radius:22px;padding:26px 30px;color:#fff;display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap;background:linear-gradient(120deg,var(--navy) 40%,var(--navy2));position:relative;overflow:hidden}
+.hero:before{content:"";position:absolute;right:-70px;top:-90px;width:300px;height:300px;border-radius:46% 54% 60% 40%;background:var(--or);opacity:.9}
+.hero>*{position:relative}
+.hero h1{font-size:30px;font-weight:800;line-height:1.15}
+.hero p{font-family:Caveat,cursive;font-size:25px;color:var(--yl);margin-top:2px}
+.stats{display:flex;gap:12px;flex-wrap:wrap}
+.st{background:#fff;color:var(--ink);border-radius:16px;padding:10px 18px;min-width:118px;box-shadow:0 8px 20px #0018382e}
+.st b{display:block;font-size:26px;font-weight:800;line-height:1.2}
+.st span{font-size:12px;color:var(--mut)}
+.layout{display:grid;grid-template-columns:310px 1fr;gap:22px;align-items:start;padding-bottom:40px}
+.rep .layout{grid-template-columns:1fr}.rep .side{display:none}
+.card{background:#fff;border:1px solid var(--ln);border-radius:18px;padding:20px 22px;margin-bottom:16px;box-shadow:0 10px 30px #00285a0f}
+.side{position:sticky;top:12px;padding:14px}
+.seg{display:flex;gap:6px;background:var(--bg);padding:4px;border-radius:12px;margin-bottom:10px}
+.seg button{flex:1;border:0;background:none;padding:7px 4px;border-radius:9px;font:600 12px Poppins,sans-serif;color:var(--mut);cursor:pointer}
+.seg button.on{background:var(--navy);color:#fff}
+#list{max-height:62vh;overflow:auto;display:grid;gap:4px}
+.emp{display:flex;align-items:center;gap:11px;width:100%;text-align:left;border:0;border-left:4px solid transparent;background:none;padding:8px 10px;border-radius:10px;cursor:pointer;font:inherit;color:inherit}
+.emp:hover{background:var(--bg)}
+.emp.on{background:#fff4ea;border-left-color:var(--or)}
+.emp strong{display:block;font-weight:600;line-height:1.25}
+.emp small{color:var(--mut);font-size:11.5px}
+.emp .d{margin-left:auto;width:10px;height:10px;border-radius:50%;background:#cdd7e4;flex:none}
+.d.prog{background:var(--yl)}.d.done{background:var(--gr)}
+.av{flex:none;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:13px;background:var(--bl)}
+.av.t{background:var(--pu)}
+.tabs{display:flex;gap:8px;margin-bottom:16px}
+.tabs button{border:0;cursor:pointer;font:700 13px Poppins,sans-serif;padding:10px 20px;border-radius:12px;background:#fff;color:var(--navy);border:1px solid var(--ln)}
+.tabs button.on{background:var(--or);color:#fff;border-color:var(--or);box-shadow:0 8px 18px #f6670240}
+.eh{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+.eh .av{width:52px;height:52px;font-size:17px}
+.eh h2{font-size:21px;line-height:1.2}.eh p{color:var(--mut);font-size:13px}
+.ct{display:inline-block;font-size:14px;font-weight:700;color:#fff;padding:4px 18px 4px 14px;margin-bottom:14px;background:var(--gr);border-radius:6px 22px 8px 20px;transform:rotate(-1deg)}
+.card:nth-of-type(2) .ct{background:var(--pu)}.card:nth-of-type(3) .ct{background:var(--bl)}
+.tg{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.f{display:block;font-size:12px;font-weight:600;color:var(--mut)}
+.tw{display:flex;gap:6px;margin-top:4px}
+.tw button{border:0;border-radius:9px;background:var(--navy);color:#fff;font:600 11px Poppins,sans-serif;padding:0 10px;cursor:pointer}
+.chips{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.chip{background:var(--bg);border-radius:12px;padding:8px 14px;font-size:12px;color:var(--mut)}
+.chip b{display:block;font-size:16px;color:var(--navy)}
+.chip.hi{background:#e6f8ef}.chip.hi b{color:var(--gr)}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.btn{border:0;cursor:pointer;font:700 13px Poppins,sans-serif;padding:10px 20px;border-radius:12px;color:#fff;background:linear-gradient(135deg,var(--or),#ff8a2b);box-shadow:0 8px 18px #f6670238;transition:all .15s}
+.btn.ghost{background:#fff;color:var(--navy);border:1.5px solid var(--navy);box-shadow:none}
+.btn:hover{filter:brightness(1.06)}
+.btn:disabled{opacity:.6;cursor:not-allowed;filter:grayscale(.4)}
+.btn-sm{padding:7px 14px!important;font-size:12px!important;border-radius:10px!important}
+.wk{display:grid;grid-template-columns:1fr 225px 40px;gap:10px;padding:14px;border:1px solid var(--ln);border-radius:14px;margin-bottom:10px;background:#fbfdff}
+.wk textarea{grid-column:1/3;resize:vertical}
+.x{border:0;background:#fde8ee;color:var(--pk);border-radius:10px;font-size:18px;cursor:pointer}
+.mail{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+.mail label{flex:1;min-width:240px}
+.note{font-size:12px;color:var(--mut);margin-top:10px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:var(--navy);color:#fff;text-align:left;padding:10px 12px;font-weight:600;white-space:nowrap}
+th:first-child{border-radius:12px 0 0 0}th:last-child{border-radius:0 12px 0 0}
+td{padding:10px 12px;border-bottom:1px solid var(--ln);vertical-align:top}
+.tw2{overflow-x:auto}
+.b{display:inline-block;font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px;color:#fff;margin-right:6px}
+.b.new{background:var(--gr)}.b.update{background:var(--bl)}.b.comment{background:var(--pu)}
+.w{margin-bottom:6px}.w em{color:var(--mut);font-style:normal}
+.na{color:#9aa9bd}
+#toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,30px);background:var(--navy);color:#fff;padding:12px 22px;border-radius:14px;font-weight:600;opacity:0;pointer-events:none;transition:.25s;z-index:999;box-shadow:0 10px 25px rgba(0,24,56,.3)}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+footer{text-align:center;padding:18px;background:var(--navy);color:#cfe0f3;font-size:12.5px}
+footer b{font-family:Caveat,cursive;font-size:20px;color:var(--yl);margin-right:8px}
+
+/* Late for Office & Reduced Hours Warning Styling */
+.alert-late{display:flex;align-items:flex-start;gap:12px;background:linear-gradient(135deg,#fff1f2,#ffe4e6);border:1.5px solid #fecdd3;border-left:5px solid var(--pk);border-radius:14px;padding:12px 16px;margin-top:14px;color:#9f1239;animation:fadeSlide .22s ease-out}
+.alert-icon{font-size:20px;line-height:1;flex:none}
+.alert-late strong{display:block;font-size:13.5px;font-weight:700;color:#881337;margin-bottom:2px}
+.alert-late p{font-size:12px;margin:0;color:#9f1239;line-height:1.45}
+
+.reason-card{background:linear-gradient(135deg,#fffbf5,#fff4e8);border:1.5px solid #fed7aa;border-left:5px solid var(--or);border-radius:14px;padding:14px 16px;margin-top:14px;animation:fadeSlide .22s ease-out}
+.reason-header{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+.reason-header strong{font-size:13.5px;color:var(--navy)}
+.pill-req{background:#fee2e2;color:#b91c1c;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:.5px}
+.cur-hours-badge{background:#ffedd5;color:#c2410c;font-size:11.5px;font-weight:600;padding:2px 9px;border-radius:8px;margin-left:auto}
+.reason-card p{font-size:12px;color:var(--mut);margin:0 0 8px 0}
+.reason-card textarea{border-color:#fdba74;background:#fff;resize:vertical;font-size:13px;transition:all .15s}
+.reason-card textarea:focus{border-color:var(--or);box-shadow:0 0 0 3px #f6670226}
+.pulse-error{border-color:var(--pk)!important;box-shadow:0 0 0 3px #ee0f5033!important;animation:pulseErr .35s ease 2}
+@keyframes pulseErr{0%,100%{transform:scale(1)}50%{transform:scale(1.02)}}
+@keyframes fadeSlide{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+
+/* Badges for Consolidated Table */
+.b-late{display:inline-block;background:var(--pk);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px;margin-top:4px;letter-spacing:.3px}
+.tag-late{display:inline-block;color:var(--pk);font-size:11px;font-weight:600}
+.hours-low{color:#dc2626!important;font-weight:700}
+.hours-ok{color:var(--gr)!important;font-weight:700}
+.reason-table-row{background:#fff7ed;border-left:3px solid var(--or);padding:5px 9px;border-radius:6px;margin-top:6px;font-size:12px;line-height:1.4}
+.reason-table-row strong{color:#c2410c}
+.reason-text{color:var(--ink)}
+.no-reason-warn{color:var(--pk);font-size:11.5px;margin-top:4px;font-weight:500}
+.late-dot{font-size:12px;margin-left:auto;margin-right:2px}
+
+/* Email & Action Buttons */
+.btn-gmail{border-color:#ea4335!important;color:#ea4335!important}
+.btn-gmail:hover{background:#ea4335!important;color:#fff!important}
+.btn-outlook{border-color:#0078d4!important;color:#0078d4!important}
+.btn-outlook:hover{background:#0078d4!important;color:#fff!important}
+
+/* Modals */
+.modal-wrap{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,24,56,.65);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:99;padding:16px;animation:fadeSlide .2s ease-out}
+.modal-card{background:#fff;border-radius:20px;width:100%;max-width:520px;box-shadow:0 20px 45px rgba(0,40,90,.25);overflow:hidden;display:flex;flex-direction:column}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;border-bottom:1px solid var(--ln);background:#fbfdff}
+.modal-head h3{font-size:17px;font-weight:700;color:var(--navy);margin:0}
+.modal-close{border:0;background:transparent;font-size:24px;color:var(--mut);cursor:pointer;line-height:1;padding:0 4px}
+.modal-close:hover{color:var(--ink)}
+.modal-body{padding:20px 24px;max-height:75vh;overflow-y:auto}
+.modal-desc{font-size:13px;color:var(--mut);margin-bottom:16px;line-height:1.5}
+.modal-info{background:var(--bg);border-radius:10px;padding:10px 14px;font-size:12px;color:var(--navy);border:1px dashed var(--ln);margin-top:12px}
+.modal-info code{background:#e2ebf6;padding:1px 5px;border-radius:4px;color:var(--navy);font-weight:600}
+.modal-foot{display:flex;justify-content:flex-end;gap:10px;padding:14px 24px;background:#fbfdff;border-top:1px solid var(--ln)}
+.choice-list{display:grid;gap:10px}
+.choice-btn{display:flex;align-items:center;gap:14px;padding:13px 16px;background:#fff;border:1.5px solid var(--ln);border-radius:14px;cursor:pointer;text-align:left;transition:all .15s;font:inherit;width:100%}
+.choice-btn:hover{border-color:var(--or);background:#fff9f5;transform:translateY(-1px);box-shadow:0 4px 12px rgba(246,103,2,.12)}
+.choice-icon{font-size:24px;flex:none;width:34px;text-align:center}
+.choice-title{font-weight:700;font-size:14px;color:var(--navy);display:block}
+.choice-sub{font-size:12px;color:var(--mut);display:block;margin-top:2px}
+
+@media(max-width:860px){.layout{grid-template-columns:1fr}.side{position:static}#list{max-height:260px}.tg{grid-template-columns:1fr 1fr}.wk{grid-template-columns:1fr}.wk textarea{grid-column:auto}.x{height:38px}.hero h1{font-size:24px}.mail label{min-width:100%}}
+@media print{header .date,.side,.tabs,.mail,.note,.hero:before,footer,.modal-wrap{display:none!important}.card{box-shadow:none}.rep .layout{display:block}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header><div class="wrap top">
+ <div class="brand"><img src="logo.png" alt="Smart Fusion logo"><i></i><div class="wm">SMART<b>FUSION</b><small>TRUST US WE WILL BUILD YOUR SUCCESS</small></div></div>
+ <label class="date">Date <input type="date" id="date"></label>
+</div></header>
+
+<main class="wrap">
+ <section class="hero">
+  <div><h1>Daily Status Report</h1><p>Small steps every day create big results!</p></div>
+  <div class="stats">
+   <div class="st"><b id="s1" style="color:var(--gr)">0</b><span>Logged in</span></div>
+   <div class="st"><b id="s2" style="color:var(--bl)">0</b><span>Logged out</span></div>
+   <div class="st"><b id="s3" style="color:var(--pu)">0</b><span>Work entries</span></div>
+   <div class="st"><b id="s4" style="color:var(--or)">0</b><span>Yet to start</span></div>
+  </div>
+ </section>
+ <nav class="tabs"><button data-v="entry" class="on">Daily entry</button><button data-v="report">Consolidated report</button></nav>
+ <div class="layout">
+  <aside class="card side">
+   <div class="seg" id="seg"><button data-t="All" class="on">All</button><button data-t="Developer">Developers</button><button data-t="Tester">Testers</button></div>
+   <div id="list"></div>
+  </aside>
+  <section id="main"></section>
+ </div>
+</main>
+<footer><b>Let's build something great together!</b> Smart Fusion Corporate, Chennai, Tamil Nadu, India</footer>
+<div id="toast"></div>
+
+<!-- Email Configuration Modal -->
+<div id="email-modal" class="modal-wrap" style="display:none">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3>⚙️ Email & EmailJS Configuration</h3>
+      <button type="button" class="modal-close" id="email-modal-close" aria-label="Close modal">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p class="modal-desc">Configure your <strong>EmailJS</strong> credentials to send daily status reports directly from the website with 1 click. You can get these free at <a href="https://www.emailjs.com" target="_blank" rel="noopener" style="color:var(--bl);font-weight:600">emailjs.com</a>.</p>
+      <label class="f" style="margin-bottom:10px">Default Recipient Email
+        <input type="email" id="cfg-to" placeholder="e.g. manager@smartfusion.com" style="margin-top:4px">
+      </label>
+      <label class="f" style="margin-bottom:10px">EmailJS Service ID
+        <input type="text" id="cfg-service" placeholder="e.g. service_xxxxxxx" style="margin-top:4px">
+      </label>
+      <label class="f" style="margin-bottom:10px">EmailJS Template ID
+        <input type="text" id="cfg-template" placeholder="e.g. template_xxxxxxx" style="margin-top:4px">
+      </label>
+      <label class="f" style="margin-bottom:10px">EmailJS Public Key
+        <input type="text" id="cfg-key" placeholder="e.g. abc123XYZ..." style="margin-top:4px">
+      </label>
+      <div class="modal-info">
+        <strong>💡 Template placeholders:</strong> In your EmailJS email template, include variables <code>{{to_email}}</code>, <code>{{subject}}</code>, and <code>{{message}}</code>.
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button type="button" class="btn ghost" id="email-modal-cancel">Cancel</button>
+      <button type="button" class="btn" id="email-modal-save">Save Settings</button>
+    </div>
+  </div>
+</div>
+
+<!-- Send Options Modal -->
+<div id="choice-modal" class="modal-wrap" style="display:none">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3>Choose Email Sending Method</h3>
+      <button type="button" class="modal-close" id="choice-modal-close" aria-label="Close modal">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p class="modal-desc">Select how you would like to send today's Consolidated Report:</p>
+      <div class="choice-list">
+        <button type="button" class="choice-btn" id="choice-gmail">
+          <span class="choice-icon">📮</span>
+          <div>
+            <span class="choice-title">Open in Gmail</span>
+            <span class="choice-sub">Pre-fills recipient, subject, and report into Gmail compose</span>
+          </div>
+        </button>
+        <button type="button" class="choice-btn" id="choice-outlook">
+          <span class="choice-icon">💼</span>
+          <div>
+            <span class="choice-title">Open in Outlook (Web / 365)</span>
+            <span class="choice-sub">Pre-fills recipient and report in Outlook Web</span>
+          </div>
+        </button>
+        <button type="button" class="choice-btn" id="choice-mailto">
+          <span class="choice-icon">✉️</span>
+          <div>
+            <span class="choice-title">Default Mail App</span>
+            <span class="choice-sub">Opens your default email client (Windows Mail / Outlook app)</span>
+          </div>
+        </button>
+        <button type="button" class="choice-btn" id="choice-copy">
+          <span class="choice-icon">📋</span>
+          <div>
+            <span class="choice-title">Copy Full Report to Clipboard</span>
+            <span class="choice-sub">Copy and paste into any email, Slack, or Teams</span>
+          </div>
+        </button>
+        <button type="button" class="choice-btn" id="choice-config">
+          <span class="choice-icon">⚙️</span>
+          <div>
+            <span class="choice-title">Configure 1-Click EmailJS Direct Send</span>
+            <span class="choice-sub">Setup keys once to send emails directly without opening webmail</span>
+          </div>
+        </button>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button type="button" class="btn ghost" id="choice-modal-cancel">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Default fallback keys (can also be saved via the in-app "Email Settings" modal)
+const DEFAULT_EMAILJS = { service: '', template: '', key: '', defaultTo: '' };
+
+function getEmailJSConfig() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('sf_emailjs_config'));
+    if (saved && (saved.service || saved.key || saved.template)) return saved;
+  } catch (e) {}
+  return DEFAULT_EMAILJS;
+}
+
+function saveEmailJSConfig(cfg) {
+  try {
+    localStorage.setItem('sf_emailjs_config', JSON.stringify(cfg));
+  } catch (e) {}
+}
+
+const DEV = ['Prathimannan','Meiarasan','Vamsi','Prasanna C','Santhosh','Meyyappan','Prasanna D','Gayathree','Shalini','Dhivya','Subash','Srivatsan','Suriya'];
+const TST = ['Aravindh','Kalai Mohan','Kavin','Khalid','Poornima','Sabari'];
+const EMP = [...DEV.map(n=>({name:n,team:'Developer',cls:''})),...TST.map(n=>({name:n,team:'Tester',cls:'t'}))].map((e,i)=>({...e,id:'e'+i}));
+
+// Website correction labels:
+// For testers: "New Website Correction" and "Existing Website Correction"
+// For developers: "New Website" and "Update"
+const TYPE_DEV = { new: 'New Website', update: 'Update' };
+const TYPE_TST = { new: 'New Website Correction', update: 'Existing Website Correction' };
+const getTypeLabel = (type, team) => (team === 'Tester' ? TYPE_TST : TYPE_DEV)[type] || type || 'Work';
+const getTypesForTeam = (team) => team === 'Tester' ? TYPE_TST : TYPE_DEV;
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const ini = n => n.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+const today = () => { const d = new Date(); return new Date(d - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 10); };
+let date = today(), team = 'All', sel = EMP[0].id, view = 'entry', data = {};
+
+const key = () => 'sf_status_' + date;
+function load() {
+  try { data = JSON.parse(localStorage.getItem(key())) || {}; } catch (e) { data = {}; }
+}
+function save() {
+  try { localStorage.setItem(key(), JSON.stringify(data)); } catch (e) { toast('Could not save in this browser'); }
+}
+function rec(id) {
+  if (!data[id]) {
+    data[id] = { login: '', lo: '', li: '', logout: '', works: [], remarks: '', reason: '' };
+  }
+  if (!data[id].works) data[id].works = [];
+  if (data[id].reason == null) data[id].reason = '';
+  return data[id];
+}
+
+const mins = t => t ? +t.slice(0, 2) * 60 + +t.slice(3) : null;
+const lunch = r => r.lo && r.li && mins(r.li) > mins(r.lo) ? mins(r.li) - mins(r.lo) : null;
+const net = r => r.login && r.logout ? mins(r.logout) - mins(r.login) - (lunch(r) || 0) : null;
+const fmt = m => m == null || m < 0 ? '-' : Math.floor(m / 60) + 'h ' + (m % 60) + 'm';
+const fd = () => new Date(date + 'T00:00').toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+const state = r => r.logout && r.login ? 'done' : r.login ? 'prog' : '';
+const entries = r => (r.works || []).filter(w => w.site || w.note).length;
+
+// Late for Office:
+// Employee starts work after 10:00 AM (mins > 600) AND completes fewer than 9 working hours (< 540 mins)
+const isLateStart = r => Boolean(r && r.login && mins(r.login) > 600);
+const isLateForOffice = r => {
+  if (!isLateStart(r)) return false;
+  const n = net(r);
+  if (r.logout) return n !== null && n < 540;
+  return true; // Arrived after 10 AM, shift of 9h not yet completed
+};
+
+// Reduced working hours upon logout (< 9 hours = 540 mins)
+const isLowHours = r => Boolean(r && r.logout && net(r) !== null && net(r) < 540);
+
+function toast(m) {
+  const t = $('#toast');
+  t.textContent = m;
+  t.classList.add('show');
+  clearTimeout(t.h);
+  t.h = setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+function side() {
+  $('#list').innerHTML = EMP.filter(e => team === 'All' || e.team === team).map(e => {
+    const r = rec(e.id);
+    const late = isLateForOffice(r) ? '<span class="late-dot" title="Late for Office">⚠️</span>' : '';
+    return `<button class="emp ${e.id === sel ? 'on' : ''}" data-id="${e.id}">
+      <span class="av ${e.cls}">${ini(e.name)}</span>
+      <span><strong>${esc(e.name)}</strong><small>${e.team}</small></span>
+      ${late}
+      <span class="d ${state(r)}"></span>
+    </button>`;
+  }).join('');
+
+  const R = EMP.map(e => rec(e.id));
+  $('#s1').textContent = R.filter(r => r.login).length;
+  $('#s2').textContent = R.filter(r => r.login && r.logout).length;
+  $('#s3').textContent = R.reduce((a, r) => a + entries(r), 0);
+  $('#s4').textContent = R.filter(r => !r.login).length;
+}
+
+function chips() {
+  const r = rec(sel), l = lunch(r), n = net(r), el = $('#chips');
+  if (!el) return;
+  const officeTime = r.login && r.logout ? mins(r.logout) - mins(r.login) : null;
+  el.innerHTML = `
+    <div class="chip">Lunch break<b>${fmt(l)}</b></div>
+    <div class="chip">Time in office<b>${fmt(officeTime)}</b></div>
+    <div class="chip ${n !== null && n >= 540 ? 'hi' : ''}">Net working hours<b>${fmt(n)}</b></div>
+  `;
+}
+
+const workRow = (w, i, team) => {
+  const types = getTypesForTeam(team);
+  const options = Object.entries(types).map(([k, v]) => `<option value="${k}" ${w.type === k ? 'selected' : ''}>${v}</option>`).join('');
+  return `<div class="wk">
+    <input data-i="${i}" data-k="site" placeholder="Website Link" value="${esc(w.site)}">
+    <select data-i="${i}" data-k="type">${options}</select>
+    <button class="x" data-del="${i}" title="Remove" aria-label="Remove entry">&times;</button>
+    <textarea rows="2" data-i="${i}" data-k="note" placeholder="What was done / your comments">${esc(w.note)}</textarea>
+  </div>`;
+};
+
+function updateAttendanceAlertsAndReason() {
+  chips();
+  const alertsEl = $('#attendance-alerts');
+  const reasonWrap = $('#reason-wrapper');
+  if (!alertsEl || !reasonWrap) return;
+  
+  const r = rec(sel);
+  const late = isLateForOffice(r);
+  const low = isLowHours(r);
+  
+  if (late) {
+    alertsEl.innerHTML = `<div class="alert-late">
+      <span class="alert-icon">⚠️</span>
+      <div>
+        <strong>Late for Office</strong>
+        <p>${r.logout ? `Logged in after 10:00 AM (${r.login}) and completed fewer than 9 working hours (${fmt(net(r))}).` : `Logged in after 10:00 AM (${r.login}). Must complete at least 9 working hours to clear this warning.`}</p>
+      </div>
+    </div>`;
+  } else {
+    alertsEl.innerHTML = '';
+  }
+  
+  if (low) {
+    reasonWrap.style.display = 'block';
+    const curBadge = reasonWrap.querySelector('.cur-hours-badge');
+    if (curBadge) curBadge.textContent = 'Current: ' + fmt(net(r)) + ' / 9h';
+    const field = reasonWrap.querySelector('#field-reason');
+    if (field && field !== document.activeElement) {
+      field.value = r.reason || '';
+    }
+  } else {
+    reasonWrap.style.display = 'none';
+  }
+}
+
+function entry() {
+  const e = EMP.find(x => x.id === sel), r = rec(sel);
+  if (!r.works.length) r.works.push({ site: '', type: 'new', note: '' });
+  
+  const late = isLateForOffice(r);
+  const low = isLowHours(r);
+  
+  $('#main').innerHTML = `
+  <div class="card">
+    <div class="eh">
+      <span class="av ${e.cls}">${ini(e.name)}</span>
+      <div><h2>${esc(e.name)}</h2><p>${e.team} team &middot; ${fd()}</p></div>
+    </div>
+    <h3 class="ct">Attendance</h3>
+    <div class="tg">
+      ${[['login','Login time'],['lo','Lunch out'],['li','Lunch in'],['logout','Logout time']].map(([k,l]) => `
+        <label class="f">${l}
+          <span class="tw">
+            <input type="time" data-f="${k}" value="${r[k] || ''}">
+            <button type="button" data-now="${k}">Now</button>
+          </span>
+        </label>
+      `).join('')}
+    </div>
+    <div class="chips" id="chips"></div>
+    <div id="attendance-alerts">
+      ${late ? `
+        <div class="alert-late">
+          <span class="alert-icon">⚠️</span>
+          <div>
+            <strong>Late for Office</strong>
+            <p>${r.logout ? `Logged in after 10:00 AM (${r.login}) and completed fewer than 9 working hours (${fmt(net(r))}).` : `Logged in after 10:00 AM (${r.login}). Must complete at least 9 working hours to clear this warning.`}</p>
+          </div>
+        </div>
+      ` : ''}
+    </div>
+    <div id="reason-wrapper" style="display:${low ? 'block' : 'none'}">
+      <div class="reason-card">
+        <div class="reason-header">
+          <span class="alert-icon" style="font-size:16px">⚠️</span>
+          <strong>Reason for Reduced Working Hours (&lt; 9 hours)</strong>
+          <span class="pill-req">Required</span>
+          <span class="cur-hours-badge">Current: ${fmt(net(r))} / 9h</span>
+        </div>
+        <p>Total working hours is under the mandatory 9 hours. Please provide the reason for leaving early or reduced hours:</p>
+        <textarea rows="2" data-f="reason" id="field-reason" placeholder="Enter reason (e.g. personal emergency, medical appointment, half-day permission)...">${esc(r.reason || '')}</textarea>
+      </div>
+    </div>
+  </div>
+  
+  <div class="card">
+    <div class="row">
+      <h3 class="ct">Websites worked on</h3>
+      <button class="btn ghost" id="add" type="button">+ Add website</button>
+    </div>
+    <div>${r.works.map((w, i) => workRow(w, i, e.team)).join('')}</div>
+  </div>
+  
+  <div class="card">
+    <h3 class="ct">Own comments</h3>
+    <textarea rows="3" data-f="remarks" placeholder="Anything else for the day: blockers, learnings, plans for tomorrow">${esc(r.remarks || '')}</textarea>
+    <div class="row" style="margin-top:14px">
+      <span class="note" style="margin:0">Entries save automatically in this browser.</span>
+      <button class="btn" id="save" type="button">Save status</button>
+    </div>
+  </div>`;
+  chips();
+}
+
+function report() {
+  const L = ['SMART FUSION - DAILY STATUS REPORT', 'Date: ' + fd(), 'Logged in: ' + $('#s1').textContent + ' of ' + EMP.length, ''];
+  EMP.forEach((e, i) => {
+    const r = rec(e.id);
+    L.push((i + 1) + '. ' + e.name + ' (' + e.team + ')');
+    if (!r.login && !entries(r) && !r.remarks && !r.reason) {
+      L.push('   No update submitted', '');
+      return;
+    }
+    L.push('   Login: ' + (r.login || '-') + ' | Lunch: ' + (r.lo && r.li ? r.lo + ' to ' + r.li : '-') + ' | Logout: ' + (r.logout || '-') + ' | Net hours: ' + fmt(net(r)));
+    if (isLateForOffice(r)) {
+      L.push('   ⚠️ Warning: Late for Office (Login: ' + (r.login || '-') + ', Net hours: ' + fmt(net(r)) + ')');
+    }
+    if (r.reason && r.reason.trim()) {
+      L.push('   Reason for reduced hours (<9h): ' + r.reason.trim());
+    }
+    r.works.filter(w => w.site || w.note).forEach(w => {
+      const typeLabel = getTypeLabel(w.type, e.team);
+      L.push('   - [' + typeLabel + '] ' + (w.site || '(no site)') + (w.note ? ': ' + w.note : ''));
+    });
+    if (r.remarks) L.push('   Comments: ' + r.remarks);
+    L.push('');
+  });
+  L.push('Sent from Smart Fusion Daily Status');
+  return L.join('\n');
+}
+
+function rep() {
+  const cfg = getEmailJSConfig();
+  let em = '';
+  try { em = localStorage.getItem('sf_email') || cfg.defaultTo || ''; } catch (e) {}
+  
+  $('#main').innerHTML = `
+  <div class="card">
+    <div class="row" style="margin-bottom:14px;align-items:center">
+      <h3 class="ct" style="margin-bottom:0">Send consolidated report</h3>
+      <button class="btn ghost btn-sm" id="btn-open-cfg" type="button">⚙️ Email Settings</button>
+    </div>
+    <div class="mail">
+      <label class="f">Send report to (email)
+        <input type="email" id="to" placeholder="name@company.com" value="${esc(em)}" style="margin-top:4px">
+      </label>
+      <button class="btn" id="send" type="button">Send Report</button>
+      <button class="btn ghost btn-gmail" id="btn-gmail" type="button" title="Compose directly in Gmail">Gmail</button>
+      <button class="btn ghost btn-outlook" id="btn-outlook" type="button" title="Compose directly in Outlook">Outlook</button>
+      <button class="btn ghost" id="copy" type="button">Copy</button>
+      <button class="btn ghost" onclick="print()" type="button">Print</button>
+    </div>
+    <p class="note">Consolidated status for ${fd()}. Direct sending via EmailJS, or 1-click Gmail/Outlook compose.</p>
+  </div>
+  
+  <div class="card">
+    <div class="tw2">
+      <table>
+        <thead>
+          <tr>
+            <th>Employee</th>
+            <th>Login</th>
+            <th>Lunch</th>
+            <th>Logout</th>
+            <th>Net hours</th>
+            <th>Work and comments</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${EMP.map(e => {
+            const r = rec(e.id);
+            const late = isLateForOffice(r);
+            const low = isLowHours(r);
+            const worksHtml = r.works.filter(x => x.site || x.note).map(x => {
+              const lbl = getTypeLabel(x.type, e.team);
+              return `<div class="w"><span class="b ${x.type}">${lbl}</span><strong>${esc(x.site)}</strong>${x.note ? ' <em>' + esc(x.note) + '</em>' : ''}</div>`;
+            }).join('');
+            const reasonHtml = r.reason ? `<div class="w reason-table-row"><strong>Reason for &lt;9 hrs:</strong> <span class="reason-text">${esc(r.reason)}</span></div>` : (low ? `<div class="w no-reason-warn">⚠️ <em>Reason for reduced hours not provided</em></div>` : '');
+            const remarksHtml = r.remarks ? `<div class="w"><em>Comments: ${esc(r.remarks)}</em></div>` : '';
+            const contentHtml = [worksHtml, reasonHtml, remarksHtml].filter(Boolean).join('') || '<span class="na">No update</span>';
+            
+            return `<tr>
+              <td>
+                <strong>${esc(e.name)}</strong><br>
+                <small class="na">${e.team}</small>
+                ${late ? '<br><span class="b-late">Late for Office</span>' : ''}
+              </td>
+              <td>
+                ${r.login || '-'}
+                ${r.login && mins(r.login) > 600 ? '<br><small class="tag-late">After 10:00</small>' : ''}
+              </td>
+              <td>${r.lo && r.li ? r.lo + ' - ' + r.li + '<br><small class="na">' + fmt(lunch(r)) + '</small>' : '-'}</td>
+              <td>${r.logout || '-'}</td>
+              <td>
+                <strong class="${low ? 'hours-low' : (net(r) >= 540 ? 'hours-ok' : '')}">${fmt(net(r))}</strong>
+              </td>
+              <td>${contentHtml}</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+function render() {
+  document.body.classList.toggle('rep', view === 'report');
+  side();
+  view === 'entry' ? entry() : rep();
+}
+
+// Event Delegation for #main
+$('#main').addEventListener('input', ev => {
+  const t = ev.target, r = rec(sel);
+  if (t.dataset.f) {
+    r[t.dataset.f] = t.value;
+  } else if (t.dataset.k) {
+    r.works[+t.dataset.i][t.dataset.k] = t.value;
+  } else {
+    return;
+  }
+  save();
+  side();
+  if (['login', 'lo', 'li', 'logout'].includes(t.dataset.f)) {
+    updateAttendanceAlertsAndReason();
+  } else {
+    chips();
+  }
+});
+
+$('#main').addEventListener('click', ev => {
+  const t = ev.target, r = rec(sel);
+  if (t.dataset.now) {
+    const d = new Date(), v = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+    r[t.dataset.now] = v;
+    save();
+    t.previousElementSibling.value = v;
+    side();
+    updateAttendanceAlertsAndReason();
+  } else if (t.id === 'add') {
+    r.works.push({ site: '', type: 'new', note: '' });
+    save();
+    entry();
+  } else if (t.dataset.del) {
+    r.works.splice(+t.dataset.del, 1);
+    save();
+    entry();
+    side();
+  } else if (t.id === 'save') {
+    if (isLowHours(r) && (!r.reason || !r.reason.trim())) {
+      toast('⚠️ Please provide reason for reduced working hours (< 9 hrs)');
+      const rf = $('#field-reason');
+      if (rf) {
+        rf.focus();
+        rf.classList.add('pulse-error');
+        setTimeout(() => rf.classList.remove('pulse-error'), 1800);
+      }
+      return;
+    }
+    save();
+    toast('Status saved for ' + EMP.find(x => x.id === sel).name);
+  } else if (t.id === 'copy') {
+    navigator.clipboard.writeText(report()).then(() => toast('Report copied to clipboard'), () => toast('Copy failed'));
+  } else if (t.id === 'send') {
+    send();
+  } else if (t.id === 'btn-gmail') {
+    triggerGmail();
+  } else if (t.id === 'btn-outlook') {
+    triggerOutlook();
+  } else if (t.id === 'btn-open-cfg') {
+    openEmailConfigModal();
+  }
+});
+
+// Email and modal functions
+function getValidRecipient() {
+  const toEl = $('#to');
+  const to = (toEl ? toEl.value : '').trim();
+  if (!/^\S+@\S+\.\S+$/.test(to)) {
+    toast('Enter a valid email address');
+    if (toEl) toEl.focus();
+    return null;
+  }
+  try { localStorage.setItem('sf_email', to); } catch (e) {}
+  return to;
+}
+
+function triggerGmail() {
+  const to = getValidRecipient();
+  if (!to) return;
+  openGmail(to, 'Smart Fusion Daily Status Report - ' + date, report());
+}
+
+function triggerOutlook() {
+  const to = getValidRecipient();
+  if (!to) return;
+  openOutlook(to, 'Smart Fusion Daily Status Report - ' + date, report());
+}
+
+function openGmail(to, sub, body) {
+  try { navigator.clipboard.writeText(body); } catch (e) {}
+  const url = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(to)}&su=${encodeURIComponent(sub)}&body=${encodeURIComponent(body)}`;
+  window.open(url, '_blank');
+  toast('Opening Gmail... Full report also copied to clipboard!');
+}
+
+function openOutlook(to, sub, body) {
+  try { navigator.clipboard.writeText(body); } catch (e) {}
+  const url = `https://outlook.office.com/mail/deeplink/compose?to=${encodeURIComponent(to)}&subject=${encodeURIComponent(sub)}&body=${encodeURIComponent(body)}`;
+  window.open(url, '_blank');
+  toast('Opening Outlook... Full report also copied to clipboard!');
+}
+
+function openMailto(to, sub, body) {
+  try { navigator.clipboard.writeText(body); } catch (e) {}
+  let mailtoBody = body;
+  if (encodeURIComponent(mailtoBody).length > 1800) {
+    mailtoBody = body.slice(0, 1200) + '\n\n... [Full report copied to clipboard. Press Ctrl+V to paste entire report here]';
+  }
+  const mailtoUrl = `mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(sub)}&body=${encodeURIComponent(mailtoBody)}`;
+  const a = document.createElement('a');
+  a.href = mailtoUrl;
+  a.target = '_blank';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  toast('Opening mail client... Full report copied to clipboard!');
+}
+
+function send() {
+  const to = getValidRecipient();
+  if (!to) return;
+  
+  const sub = 'Smart Fusion Daily Status Report - ' + date;
+  const body = report();
+  const cfg = getEmailJSConfig();
+  
+  if (cfg.service && cfg.key && cfg.template && typeof emailjs !== 'undefined') {
+    const sendBtn = $('#send');
+    const origText = sendBtn ? sendBtn.textContent : 'Send Report';
+    if (sendBtn) {
+      sendBtn.disabled = true;
+      sendBtn.textContent = 'Sending...';
+    }
+    
+    try {
+      emailjs.init({ publicKey: cfg.key });
+    } catch (e) {}
+    
+    emailjs.send(cfg.service, cfg.template, {
+      to_email: to,
+      email: to,
+      recipient: to,
+      subject: sub,
+      message: body,
+      report: body,
+      date: fd()
+    }, cfg.key).then(() => {
+      toast('✅ Report sent successfully to ' + to);
+      if (sendBtn) {
+        sendBtn.disabled = false;
+        sendBtn.textContent = origText;
+      }
+    }).catch(err => {
+      console.error(err);
+      toast('⚠️ EmailJS error: ' + (err?.text || err?.message || 'Check keys') + '. Opening options...');
+      if (sendBtn) {
+        sendBtn.disabled = false;
+        sendBtn.textContent = origText;
+      }
+      openChoiceModal(to, sub, body);
+    });
+    return;
+  }
+  
+  // If EmailJS is not configured yet, open modal with options:
+  openChoiceModal(to, sub, body);
+}
+
+let currentEmailContext = { to: '', sub: '', body: '' };
+
+function openChoiceModal(to, sub, body) {
+  currentEmailContext = { to, sub, body };
+  $('#choice-modal').style.display = 'flex';
+}
+
+function closeChoiceModal() {
+  $('#choice-modal').style.display = 'none';
+}
+
+function openEmailConfigModal() {
+  const cfg = getEmailJSConfig();
+  $('#cfg-to').value = cfg.defaultTo || localStorage.getItem('sf_email') || '';
+  $('#cfg-service').value = cfg.service || '';
+  $('#cfg-template').value = cfg.template || '';
+  $('#cfg-key').value = cfg.key || '';
+  $('#email-modal').style.display = 'flex';
+}
+
+function closeEmailConfigModal() {
+  $('#email-modal').style.display = 'none';
+}
+
+// Choice modal buttons
+$('#choice-modal-close').onclick = closeChoiceModal;
+$('#choice-modal-cancel').onclick = closeChoiceModal;
+$('#choice-gmail').onclick = () => {
+  closeChoiceModal();
+  openGmail(currentEmailContext.to, currentEmailContext.sub, currentEmailContext.body);
+};
+$('#choice-outlook').onclick = () => {
+  closeChoiceModal();
+  openOutlook(currentEmailContext.to, currentEmailContext.sub, currentEmailContext.body);
+};
+$('#choice-mailto').onclick = () => {
+  closeChoiceModal();
+  openMailto(currentEmailContext.to, currentEmailContext.sub, currentEmailContext.body);
+};
+$('#choice-copy').onclick = () => {
+  closeChoiceModal();
+  navigator.clipboard.writeText(currentEmailContext.body).then(() => toast('Report copied to clipboard!'));
+};
+$('#choice-config').onclick = () => {
+  closeChoiceModal();
+  openEmailConfigModal();
+};
+
+// Email Config modal buttons
+$('#email-modal-close').onclick = closeEmailConfigModal;
+$('#email-modal-cancel').onclick = closeEmailConfigModal;
+$('#email-modal-save').onclick = () => {
+  const cfg = {
+    defaultTo: $('#cfg-to').value.trim(),
+    service: $('#cfg-service').value.trim(),
+    template: $('#cfg-template').value.trim(),
+    key: $('#cfg-key').value.trim()
+  };
+  saveEmailJSConfig(cfg);
+  if (cfg.defaultTo) {
+    try { localStorage.setItem('sf_email', cfg.defaultTo); } catch (e) {}
+    const toEl = $('#to');
+    if (toEl) toEl.value = cfg.defaultTo;
+  }
+  closeEmailConfigModal();
+  toast('Email settings saved successfully!');
+};
+
+// Close modal when clicking outside
+window.addEventListener('click', ev => {
+  if (ev.target === $('#email-modal')) closeEmailConfigModal();
+  if (ev.target === $('#choice-modal')) closeChoiceModal();
+});
+window.addEventListener('keydown', ev => {
+  if (ev.key === 'Escape') {
+    closeEmailConfigModal();
+    closeChoiceModal();
+  }
+});
+
+$('#list').addEventListener('click', ev => {
+  const b = ev.target.closest('.emp');
+  if (b) { sel = b.dataset.id; render(); }
+});
+$('#seg').addEventListener('click', ev => {
+  const b = ev.target.closest('button');
+  if (!b) return;
+  team = b.dataset.t;
+  document.querySelectorAll('#seg button').forEach(x => x.classList.toggle('on', x === b));
+  side();
+});
+document.querySelector('.tabs').addEventListener('click', ev => {
+  const b = ev.target.closest('button');
+  if (!b) return;
+  view = b.dataset.v;
+  document.querySelectorAll('.tabs button').forEach(x => x.classList.toggle('on', x === b));
+  render();
+});
+$('#date').value = date;
+$('#date').addEventListener('change', e => {
+  date = e.target.value || today();
+  load();
+  render();
+});
+
+load();
+render();
+</script>
+</body>
+</html>
