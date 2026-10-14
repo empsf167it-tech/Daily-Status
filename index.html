@@ -2210,10 +2210,7 @@
       <span class="av ${e.cls}">${ini(e.name)}</span>
       <div><h2>${esc(e.name)}</h2><p>${e.team} team &middot; ${fd()}</p></div>
     </div>
-    <div class="row" style="align-items:center;margin-bottom:12px">
-      <h3 class="ct" style="margin-bottom:0">Attendance</h3>
-      <span class="save-indicator" id="save-indicator"><span class="save-indicator-dot saved"></span> Auto-saved</span>
-    </div>
+    <h3 class="ct">Attendance</h3>
     <div class="tg">
       ${[['login', 'Login time'], ['lo', 'Lunch out'], ['li', 'Lunch in'], ['logout', 'Logout time']].map(([k, l]) => timeField12(k, l, r[k])).join('')}
     </div>
@@ -2255,7 +2252,7 @@
     <h3 class="ct">Own comments</h3>
     <textarea rows="3" data-f="remarks" placeholder="Anything else for the day: blockers, learnings, plans for tomorrow (optional)">${esc(r.remarks || '')}</textarea>
     <div class="row" style="margin-top:14px">
-      <span class="note" style="margin:0">All entries auto-save instantly. Complete mandatory fields (*) and click Save status at logout.</span>
+      <span class="note" style="margin:0">Complete mandatory fields (*) and click Save status at logout.</span>
       <button class="btn" id="save" type="button">Save status</button>
     </div>
   </div>`;
